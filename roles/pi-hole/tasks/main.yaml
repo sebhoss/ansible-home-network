@@ -1,0 +1,105 @@
+- name: Create group
+  ansible.builtin.group:
+    name: pi-hole
+    state: present
+  tags:
+    - pi-hole
+
+- name: Add user
+  ansible.builtin.user:
+    name: pi-hole
+    group: pi-hole
+    state: present
+  tags:
+    - pi-hole
+
+- name: Create local Pi-Hole data and config directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    owner: pi-hole
+    group: pi-hole
+    state: directory
+  with_items:
+    - /var/home/pi-hole/etc-pihole
+    - /var/home/pi-hole/etc-dnsmasq.d
+  tags:
+    - pi-hole
+
+- name: Create drop-in directory for systemd-resolved
+  ansible.builtin.file:
+    path: /etc/systemd/resolved.conf.d/
+    owner: root
+    group: root
+    state: directory
+  tags:
+    - pi-hole
+
+- name: Disable systemd-resolved stub listener
+  ansible.builtin.template:
+    src: resolved-disable-stublistener.conf
+    dest: /etc/systemd/resolved.conf.d/disable-stublistener.conf
+  notify:
+    - Restart systemd-resolved
+  tags:
+    - pi-hole
+
+- name: Set systemd-resolved static DNS
+  ansible.builtin.template:
+    src: resolved-dns.conf
+    dest: /etc/systemd/resolved.conf.d/dns.conf
+  notify:
+    - Restart systemd-resolved
+  tags:
+    - pi-hole
+
+- name: Set systemd-resolved fallback DNS
+  ansible.builtin.template:
+    src: resolved-fallback-dns.conf
+    dest: /etc/systemd/resolved.conf.d/fallback-dns.conf
+  notify:
+    - Restart systemd-resolved
+  tags:
+    - pi-hole
+
+# switch resolved config to upstream mode
+- name: Symlink /etc/resolv.conf to /run/systemd/resolve/resolv.conf
+  ansible.builtin.file:
+    src: /run/systemd/resolve/resolv.conf
+    dest: /etc/resolv.conf
+    owner: "990"
+    group: "989"
+    state: link
+  notify:
+    - Restart systemd-resolved
+  tags:
+    - pi-hole
+
+- name: Write Quadlet template
+  ansible.builtin.template:
+    src: pi-hole.container
+    dest: /etc/containers/systemd/pi-hole.container
+  notify:
+    - Reload systemd daemon
+    - Restart Pi-Hole container
+  tags:
+    - pi-hole
+
+# This is required for the Pi-Hole web UI to work over port 80
+- name: Add firewall rule for HTTP access
+  ansible.posix.firewalld:
+    service: http
+    permanent: true
+    state: enabled
+    immediate: true
+  tags:
+    - pi-hole
+
+# This is required so that the Pi-Hole can answer DNS queries on port 53
+- name: Add firewall rule for DNS access
+  ansible.posix.firewalld:
+    service: dns
+    permanent: true
+    state: enabled
+    immediate: true
+  tags:
+    - pi-hole

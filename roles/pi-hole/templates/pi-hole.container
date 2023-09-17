@@ -1,0 +1,30 @@
+[Unit]
+Description=The Pi-Hole container
+After=local-fs.target
+
+[Container]
+Image=docker.io/pihole/pihole:latest
+User=pi-hole
+Group=pi-hole
+UserNS=keep-id
+PodmanArgs=--dns=9.9.9.9
+PodmanArgs=--dns=149.112.112.112
+#DNS=9.9.9.9
+#DNS=149.112.112.112
+PublishPort=53:53/tcp
+PublishPort=53:53/udp
+PublishPort=80:80/tcp
+AutoUpdate=registry
+Volume=/var/home/pi-hole/etc-pihole:/etc/pihole:z
+Volume=/var/home/pi-hole/etc-dnsmasq.d:/etc/dnsmasq.d:z
+Timezone={{ pi_hole__timezone }}
+Environment=TZ={{ pi_hole__timezone }}
+Environment=WEBPASSWORD={{ pi_hole__web_password }}
+Environment=FTLCONF_LOCAL_IPV4={{ pi_hole__local_ipv4 }}
+Environment=PIHOLE_DNS_=9.9.9.9;149.112.112.112;2620:fe::fe;2620:fe::9
+Environment=DNSSEC=false
+Environment=DHCP_ACTIVE=false
+Environment=WEBTHEME=default-darker
+
+[Install]
+WantedBy=default.target

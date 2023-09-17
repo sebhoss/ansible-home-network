@@ -1,0 +1,5 @@
+- name: Set ARPA hostname
+  ansible.builtin.hostname:
+    name: "{{ hostname__fqdn_arpa_address }}"
+  tags:
+    - hostname

@@ -1,0 +1,26 @@
+- name: Install packages
+  community.general.rpm_ostree_pkg:
+    name:
+      - cockpit
+      - cockpit-podman
+    state: present
+  notify: Reboot system
+  tags:
+    - cockpit
+
+- name: Start cockpit socket
+  ansible.builtin.systemd:
+    name: cockpit.socket
+    state: started
+    enabled: true
+  tags:
+    - cockpit
+
+- name: Add firewall rule HTTP access
+  ansible.posix.firewalld:
+    service: cockpit
+    permanent: true
+    state: enabled
+    immediate: true
+  tags:
+    - cockpit

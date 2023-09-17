@@ -1,0 +1,27 @@
+- name: Add seb user
+  ansible.builtin.user:
+    name: seb
+    comment: Sebastian Hoß
+    password: "{{ seb__password_hash }}"
+    uid: 1000
+    group: wheel
+    state: present
+  tags:
+    - seb
+
+- name: Set authorized key for seb
+  ansible.posix.authorized_key:
+    user: seb
+    state: present
+    key: "{{ lookup('file', '/var/home/seb/.ssh/pi_hole.pub') }}"
+  tags:
+    - seb
+
+- name: Allow group wheel sudo access without password
+  community.general.sudoers:
+    name: wheel-all
+    group: wheel
+    commands: ALL
+    nopassword: true
+  tags:
+    - seb

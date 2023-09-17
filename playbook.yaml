@@ -1,0 +1,7 @@
+- name: Pi-Hole Configuration
+  hosts: pi_holes
+  roles:
+    - hostname
+    - seb
+    - cockpit
+    - pi-hole
