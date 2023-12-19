@@ -1,28 +1,19 @@
 - name: Create group
   ansible.builtin.group:
-    name: pi-hole
+    name: "{{ pi_hole__group }}"
     state: present
   tags:
+    - service-users
     - pi-hole
 
 - name: Add user
   ansible.builtin.user:
-    name: pi-hole
-    group: pi-hole
+    name: "{{ pi_hole__user }}"
+    group: "{{ pi_hole__group }}"
     state: present
+  register: pi_hole__created_user
   tags:
-    - pi-hole
-
-- name: Create local Pi-Hole data and config directories
-  ansible.builtin.file:
-    path: "{{ item }}"
-    owner: pi-hole
-    group: pi-hole
-    state: directory
-  with_items:
-    - /var/home/pi-hole/etc-pihole
-    - /var/home/pi-hole/etc-dnsmasq.d
-  tags:
+    - service-users
     - pi-hole
 
 - name: Create drop-in directory for systemd-resolved
@@ -32,6 +23,7 @@
     group: root
     state: directory
   tags:
+    - systemd-resolved
     - pi-hole
 
 - name: Disable systemd-resolved stub listener
@@ -39,8 +31,9 @@
     src: resolved-disable-stublistener.conf
     dest: /etc/systemd/resolved.conf.d/disable-stublistener.conf
   notify:
-    - Restart systemd-resolved
+    - systemd-resolved-restart
   tags:
+    - systemd-resolved
     - pi-hole
 
 - name: Set systemd-resolved static DNS
@@ -48,8 +41,9 @@
     src: resolved-dns.conf
     dest: /etc/systemd/resolved.conf.d/dns.conf
   notify:
-    - Restart systemd-resolved
+    - systemd-resolved-restart
   tags:
+    - systemd-resolved
     - pi-hole
 
 - name: Set systemd-resolved fallback DNS
@@ -57,8 +51,9 @@
     src: resolved-fallback-dns.conf
     dest: /etc/systemd/resolved.conf.d/fallback-dns.conf
   notify:
-    - Restart systemd-resolved
+    - systemd-resolved-restart
   tags:
+    - systemd-resolved
     - pi-hole
 
 # switch resolved config to upstream mode
@@ -70,7 +65,20 @@
     group: "989"
     state: link
   notify:
-    - Restart systemd-resolved
+    - systemd-resolved-restart
+  tags:
+    - systemd-resolved
+    - pi-hole
+
+- name: Create local Pi-Hole data and config directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    owner: "{{ pi_hole__user }}"
+    group: "{{ pi_hole__group }}"
+    state: directory
+  with_items:
+    - "{{ pi_hole__created_user.home }}/etc-pihole"
+    - "{{ pi_hole__created_user.home }}/etc-dnsmasq.d"
   tags:
     - pi-hole
 
@@ -79,8 +87,17 @@
     src: pi-hole.container
     dest: /etc/containers/systemd/pi-hole.container
   notify:
-    - Reload systemd daemon
-    - Restart Pi-Hole container
+    - systemd-daemon-reload
+    - pi-hole-restart
+  tags:
+    - pi-hole
+
+- name: Manage custom.list file
+  ansible.builtin.template:
+    src: custom.list
+    dest: "{{ pi_hole__created_user.home }}/etc-pihole/custom.list"
+  notify:
+    - pi-hole-restart
   tags:
     - pi-hole
 

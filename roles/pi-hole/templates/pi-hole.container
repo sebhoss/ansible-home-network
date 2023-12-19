@@ -1,27 +1,28 @@
+# {{ ansible_managed }}
 [Unit]
 Description=The Pi-Hole container
 After=local-fs.target
 
 [Container]
 Image=docker.io/pihole/pihole:latest
-User=pi-hole
-Group=pi-hole
+User={{ pi_hole__user }}
+Group={{ pi_hole__group }}
 UserNS=keep-id
-PodmanArgs=--dns=9.9.9.9
-PodmanArgs=--dns=149.112.112.112
-#DNS=9.9.9.9
-#DNS=149.112.112.112
+DNS={{ pi_hole__dns_ipv4_1 }}
+DNS={{ pi_hole__dns_ipv4_2 }}
+DNS={{ pi_hole__dns_ipv6_1 }}
+DNS={{ pi_hole__dns_ipv6_2 }}
 PublishPort=53:53/tcp
 PublishPort=53:53/udp
 PublishPort=80:80/tcp
 AutoUpdate=registry
-Volume=/var/home/pi-hole/etc-pihole:/etc/pihole:z
-Volume=/var/home/pi-hole/etc-dnsmasq.d:/etc/dnsmasq.d:z
+Volume={{ pi_hole__created_user.home }}/etc-pihole:/etc/pihole:z
+Volume={{ pi_hole__created_user.home }}/etc-dnsmasq.d:/etc/dnsmasq.d:z
 Timezone={{ pi_hole__timezone }}
 Environment=TZ={{ pi_hole__timezone }}
 Environment=WEBPASSWORD={{ pi_hole__web_password }}
 Environment=FTLCONF_LOCAL_IPV4={{ pi_hole__local_ipv4 }}
-Environment=PIHOLE_DNS_=9.9.9.9;149.112.112.112;2620:fe::fe;2620:fe::9
+Environment=PIHOLE_DNS_={{ pi_hole__dns_ipv4_1 }};{{ pi_hole__dns_ipv4_2 }};{{ pi_hole__dns_ipv6_1 }};{{ pi_hole__dns_ipv6_2 }}
 Environment=DNSSEC=false
 Environment=DHCP_ACTIVE=false
 Environment=WEBTHEME=default-darker

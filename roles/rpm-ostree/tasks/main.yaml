@@ -1,0 +1,30 @@
+- name: Customize rpm-ostreed.conf
+  ansible.builtin.template:
+    src: rpm-ostreed.conf
+    dest: /etc/rpm-ostreed.conf
+  tags:
+    - rpm-ostree
+
+- name: Enable rpm-ostreed-automatic timer
+  ansible.builtin.systemd_service:
+    name: rpm-ostreed-automatic.timer
+    state: started
+    enabled: true
+  tags:
+    - rpm-ostree
+
+- name: Create override directory for rpm-ostreed-automatic.timer
+  ansible.builtin.file:
+    path: /etc/systemd/system/rpm-ostreed-automatic.timer.d
+    state: directory
+  tags:
+    - rpm-ostree
+
+- name: Customize rpm-ostreed-automatic timer
+  ansible.builtin.template:
+    src: rpm-ostreed-automatic.timer
+    dest: /etc/systemd/system/rpm-ostreed-automatic.timer.d/override.conf
+  notify:
+    - systemd-daemon-reload
+  tags:
+    - rpm-ostree

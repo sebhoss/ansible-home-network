@@ -1,0 +1,23 @@
+- name: Enable podman-auto-update timer
+  ansible.builtin.systemd_service:
+    name: podman-auto-update.timer
+    state: started
+    enabled: true
+  tags:
+    - podman
+
+- name: Create override directory for podman-auto-update.timer
+  ansible.builtin.file:
+    path: /etc/systemd/system/podman-auto-update.timer.d
+    state: directory
+  tags:
+    - rpm-ostree
+
+- name: Customize podman-auto-update timer
+  ansible.builtin.template:
+    src: podman-auto-update.timer
+    dest: /etc/systemd/system/podman-auto-update.timer.d/override.conf
+  notify:
+    - systemd-daemon-reload
+  tags:
+    - podman

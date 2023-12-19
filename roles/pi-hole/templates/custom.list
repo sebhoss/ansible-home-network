@@ -1,0 +1,3 @@
+# {{ ansible_managed }}
+192.168.1.128 dns1.seb.home.arpa
+192.168.1.129 dns2.seb.home.arpa

@@ -1,0 +1,4 @@
+# {{ ansible_managed }}
+[Timer]
+OnCalendar=
+OnCalendar={{ podman__auto_update_service_schedule }}

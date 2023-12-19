@@ -1,6 +1,6 @@
 # Ansible Playbook for Home Network
 
-This repository contains an [ansible](https://www.ansible.com/) playbook for my local home network. It currently only managed a single Raspberry Pi 4 running Pi-hole.
+This repository contains an [ansible](https://www.ansible.com/) playbook for my local home network. It currently manages two Raspberry Pi 4 nodes running Pi-hole using Podman/Quadlet.
 
 ## Setup
 

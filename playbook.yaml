@@ -1,7 +1,9 @@
 - name: Pi-Hole Configuration
   hosts: pi_holes
+  handlers:
+    - import_tasks: handlers/systemd.yaml
   roles:
     - hostname
-    - seb
-    - cockpit
+    - rpm-ostree
+    - podman
     - pi-hole

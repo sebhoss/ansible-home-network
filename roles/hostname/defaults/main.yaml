@@ -1,1 +1,2 @@
 #hostname__fqdn_arpa_address: somewhere.home.arpa
+hostname__update_strategy: systemd

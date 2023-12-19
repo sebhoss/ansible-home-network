@@ -1,0 +1,6 @@
+# {{ ansible_managed }}
+[Timer]
+OnBootSec=
+OnUnitInactiveSec=
+OnCalendar=
+OnCalendar={{ rpm_ostree__upgrade_schedule }}
