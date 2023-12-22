@@ -5,9 +5,6 @@ After=local-fs.target
 
 [Container]
 Image=docker.io/pihole/pihole:latest
-User={{ pi_hole__user }}
-Group={{ pi_hole__group }}
-UserNS=keep-id
 DNS={{ pi_hole__dns_ipv4_1 }}
 DNS={{ pi_hole__dns_ipv4_2 }}
 DNS={{ pi_hole__dns_ipv6_1 }}
@@ -16,8 +13,8 @@ PublishPort=53:53/tcp
 PublishPort=53:53/udp
 PublishPort=80:80/tcp
 AutoUpdate=registry
-Volume={{ pi_hole__created_user.home }}/etc-pihole:/etc/pihole:z
-Volume={{ pi_hole__created_user.home }}/etc-dnsmasq.d:/etc/dnsmasq.d:z
+Volume={{ pi_hole__etc_dir }}/pihole:/etc/pihole:Z
+Volume={{ pi_hole__etc_dir }}/dnsmasq.d:/etc/dnsmasq.d:Z
 Timezone={{ pi_hole__timezone }}
 Environment=TZ={{ pi_hole__timezone }}
 Environment=WEBPASSWORD={{ pi_hole__web_password }}

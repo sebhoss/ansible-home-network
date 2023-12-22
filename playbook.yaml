@@ -1,7 +1,5 @@
 - name: Pi-Hole Configuration
   hosts: pi_holes
-  handlers:
-    - import_tasks: handlers/systemd.yaml
   roles:
     - hostname
     - rpm-ostree

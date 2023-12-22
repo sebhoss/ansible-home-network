@@ -11,7 +11,7 @@
     path: /etc/systemd/system/podman-auto-update.timer.d
     state: directory
   tags:
-    - rpm-ostree
+    - podman
 
 - name: Customize podman-auto-update timer
   ansible.builtin.template:
