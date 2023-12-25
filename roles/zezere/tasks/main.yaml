@@ -1,0 +1,14 @@
+- name: Disable zezere_ignition timer
+  ansible.builtin.systemd_service:
+    name: zezere_ignition.timer
+    state: stopped
+    enabled: false
+  tags:
+    - zezere
+
+- name: Delete /boot/ignition.firstboot file
+  ansible.builtin.file:
+    path: /boot/ignition.firstboot
+    state: absent
+  tags:
+    - zezere
