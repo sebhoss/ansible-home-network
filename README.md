@@ -8,17 +8,8 @@ This repository contains an [ansible](https://www.ansible.com/) playbook for my 
 - `pi-hole`: Installs [Pi-hole](https://pi-hole.net/) using [Podman Quadlet](https://docs.podman.io/en/latest/markdown/podman-systemd.unit.5.html)
 - `zezere`: Disables the [zezere/ignition](https://docs.fedoraproject.org/en-US/iot/ignition/) timer/service since that causes high load without providing any use in my setup
 
-## Setup
-
-```shell
-$ python3 -m venv .venv
-$ source .venv/bin/activate
-$ pip install ansible-core
-$ ansible-galaxy collection install --requirements-file requirements.yaml
-```
-
 ## Usage
 
 ```shell
-$ ansible-playbook --check --diff playbook.yaml
+$ ./play --check --diff
 ```

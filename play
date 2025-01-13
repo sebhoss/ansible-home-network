@@ -1,0 +1,18 @@
+#!/usr/bin/env sh
+
+EXPECTED_ANSIBLE_POSIX_VERSION=$(yq '.collections[] | select(.name == "ansible.posix") | .version' requirements.yaml | tr --delete '==')
+EXPECTED_COMMUNITY_GENERAL_VERSION=$(yq '.collections[] | select(.name == "community.general") | .version' requirements.yaml | tr --delete '==')
+
+INSTALLED_ANSIBLE_POSIX_VERSION=$(uv run -- ansible-galaxy collection list | grep 'ansible.posix' | head --lines 1 | tr --squeeze-repeats ' ' | cut --delimiter ' ' --fields 2)
+INSTALLED_COMMUNITY_GENERAL_VERSION=$(uv run -- ansible-galaxy collection list | grep 'community.general' | head --lines 1 | tr --squeeze-repeats ' ' | cut --delimiter ' ' --fields 2)
+
+if [ "${EXPECTED_ANSIBLE_POSIX_VERSION}" != "${INSTALLED_ANSIBLE_POSIX_VERSION}" ]; then
+  echo "[ERROR] The 'ansible.posix' collection does not have the correct version. Please execute 'uv run -- ansible-galaxy install -r requirements.yaml'" 1>&2
+  exit 1
+fi
+if [ "${EXPECTED_COMMUNITY_GENERAL_VERSION}" != "${INSTALLED_COMMUNITY_GENERAL_VERSION}" ]; then
+  echo "[ERROR] The 'community.general' collection does not have the correct version. Please execute 'uv run -- ansible-galaxy install -r requirements.yaml'" 1>&2
+  exit 1
+fi
+
+uv run -- ansible-playbook "$@" playbook.yaml
