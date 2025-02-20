@@ -12,17 +12,19 @@ DNS={{ pi_hole__dns_ipv6_2 }}
 PublishPort=53:53/tcp
 PublishPort=53:53/udp
 PublishPort=80:80/tcp
+PublishPort=443:443/tcp
 AutoUpdate=registry
 Volume={{ pi_hole__etc_dir }}/pihole:/etc/pihole:Z
 Volume={{ pi_hole__etc_dir }}/dnsmasq.d:/etc/dnsmasq.d:Z
 Timezone={{ pi_hole__timezone }}
 Environment=TZ={{ pi_hole__timezone }}
-Environment=WEBPASSWORD={{ pi_hole__web_password }}
-Environment=FTLCONF_LOCAL_IPV4={{ pi_hole__local_ipv4 }}
-Environment=PIHOLE_DNS_={{ pi_hole__dns_ipv4_1 }};{{ pi_hole__dns_ipv4_2 }};{{ pi_hole__dns_ipv6_1 }};{{ pi_hole__dns_ipv6_2 }}
-Environment=DNSSEC=false
-Environment=DHCP_ACTIVE=false
-Environment=WEBTHEME=default-darker
+Environment=FTLCONF_webserver_port='80,443s'
+Environment=FTLCONF_webserver_api_password={{ pi_hole__web_password }}
+Environment=FTLCONF_dns_listeningMode=all
+Environment=FTLCONF_dns_upstreams={{ pi_hole__dns_ipv4_1 }};{{ pi_hole__dns_ipv4_2 }};{{ pi_hole__dns_ipv6_1 }};{{ pi_hole__dns_ipv6_2 }}
+Environment=FTLCONF_webserver_interface_theme=default-darker
+Environment=FTLCONF_dns_dnssec=false
+Environment=FTLCONF_dhcp_active=false
 
 [Install]
 WantedBy=default.target

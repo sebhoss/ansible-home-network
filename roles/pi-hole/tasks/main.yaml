@@ -72,19 +72,29 @@
   tags:
     - pi-hole
 
-- name: Manage custom.list file
-  ansible.builtin.template:
-    src: custom.list
-    dest: "{{ pi_hole__etc_dir }}/pihole/custom.list"
-  notify:
-    - pi-hole-restart
-  tags:
-    - pi-hole
+#- name: Manage custom.list file
+#  ansible.builtin.template:
+#    src: custom.list
+#    dest: "{{ pi_hole__etc_dir }}/pihole/hosts/custom.list"
+#  notify:
+#    - pi-hole-restart
+#  tags:
+#    - pi-hole
 
 # This is required for the Pi-Hole web UI to work over port 80
 - name: Add firewall rule for HTTP access
   ansible.posix.firewalld:
     service: http
+    permanent: true
+    state: enabled
+    immediate: true
+  tags:
+    - pi-hole
+
+# This is required for the Pi-Hole web UI to work over port 443
+- name: Add firewall rule for HTTPS access
+  ansible.posix.firewalld:
+    service: https
     permanent: true
     state: enabled
     immediate: true
